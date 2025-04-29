@@ -1,3 +1,4 @@
+
 import type { Config } from "tailwindcss";
 
 export default {
@@ -61,6 +62,20 @@ export default {
 					'accent-foreground': 'hsl(var(--sidebar-accent-foreground))',
 					border: 'hsl(var(--sidebar-border))',
 					ring: 'hsl(var(--sidebar-ring))'
+				},
+				// Custom colors for the fraud detection app
+				ecg: {
+					blue: '#0A4D92',
+					red: '#E63946',
+					yellow: '#FFB703',
+					green: '#2A9D8F',
+					gray: '#495057',
+					lightgray: '#E9ECEF'
+				},
+				risk: {
+					high: '#E63946',
+					medium: '#FFB703',
+					low: '#2A9D8F'
 				}
 			},
 			borderRadius: {
