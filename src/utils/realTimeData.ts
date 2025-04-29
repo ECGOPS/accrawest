@@ -5,7 +5,7 @@ import { districts } from './mockData';
 export interface AnomalyData {
   districtId: number;
   timestamp: Date;
-  anomalyType: 'consumption_spike' | 'voltage_irregularity' | 'connection_change' | 'payment_anomaly';
+  anomalyType: 'meter_bypass' | 'meter_tampering' | 'direct_connection' | 'unauthorized_connection';
   severity: 'low' | 'medium' | 'high';
   value: number;
   threshold: number;
@@ -16,19 +16,19 @@ export interface AnomalyData {
 export const generateRandomAnomalies = (count: number = 1): AnomalyData[] => {
   const anomalies: AnomalyData[] = [];
   const anomalyTypes: AnomalyData['anomalyType'][] = [
-    'consumption_spike',
-    'voltage_irregularity',
-    'connection_change',
-    'payment_anomaly'
+    'meter_bypass',
+    'meter_tampering',
+    'direct_connection',
+    'unauthorized_connection'
   ];
   
   const severities: AnomalyData['severity'][] = ['low', 'medium', 'high'];
   
   const descriptions = {
-    consumption_spike: 'Unusual consumption pattern detected',
-    voltage_irregularity: 'Voltage fluctuation outside normal range',
-    connection_change: 'Unauthorized connection status change',
-    payment_anomaly: 'Irregular payment pattern detected'
+    meter_bypass: 'Potential meter bypass detected',
+    meter_tampering: 'Meter tampering activity detected',
+    direct_connection: 'Illegal direct connection detected',
+    unauthorized_connection: 'Unauthorized service connection detected'
   };
   
   // Get random districts
@@ -39,8 +39,19 @@ export const generateRandomAnomalies = (count: number = 1): AnomalyData[] => {
   for (const district of randomDistricts) {
     const type = anomalyTypes[Math.floor(Math.random() * anomalyTypes.length)];
     const severity = severities[Math.floor(Math.random() * severities.length)];
-    const value = Math.round(Math.random() * 100);
-    const threshold = Math.round(50 + Math.random() * 20);
+    
+    // Generate values based on severity
+    let value, threshold;
+    if (severity === 'high') {
+      threshold = 75;
+      value = Math.round(threshold + 10 + Math.random() * 15);
+    } else if (severity === 'medium') {
+      threshold = 50;
+      value = Math.round(threshold + 5 + Math.random() * 20);
+    } else {
+      threshold = 25;
+      value = Math.round(threshold + Math.random() * 15);
+    }
     
     anomalies.push({
       districtId: district.id,
