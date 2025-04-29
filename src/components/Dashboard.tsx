@@ -1,6 +1,15 @@
 
+import { useState } from "react";
 import { fraudTypes } from "@/utils/mockData";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Filter } from "lucide-react";
 import MetricsOverview from "./MetricsOverview";
 import FraudTypeCard from "./FraudTypeCard";
 import DistrictRiskCard from "./DistrictRiskCard";
@@ -10,6 +19,18 @@ import RealTimeMonitoring from "./RealTimeMonitoring";
 import { districts } from "@/utils/mockData";
 
 const Dashboard = () => {
+  const [selectedDistrict, setSelectedDistrict] = useState<string>("all");
+
+  // Filter districts based on selection
+  const filteredDistricts = selectedDistrict === "all" 
+    ? districts 
+    : districts.filter(district => district.name === selectedDistrict);
+
+  // Get top 4 districts by risk score from filtered districts
+  const topRiskDistricts = [...filteredDistricts]
+    .sort((a, b) => b.riskScore - a.riskScore)
+    .slice(0, 4);
+
   return (
     <div className="mx-auto max-w-7xl p-4 sm:p-6">
       <div className="flex items-center gap-4 mb-8">
@@ -25,6 +46,29 @@ const Dashboard = () => {
           <p className="text-muted-foreground">
             Visualizing fraud data across eight districts to enhance detection and prevention efforts
           </p>
+        </div>
+      </div>
+
+      <div className="flex items-center justify-between mb-6">
+        <h2 className="text-lg font-medium">Dashboard Overview</h2>
+        <div className="flex items-center gap-2">
+          <Filter className="h-4 w-4 text-muted-foreground" />
+          <Select
+            value={selectedDistrict}
+            onValueChange={setSelectedDistrict}
+          >
+            <SelectTrigger className="w-[180px]">
+              <SelectValue placeholder="Filter by District" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Districts</SelectItem>
+              {districts.map((district) => (
+                <SelectItem key={district.id} value={district.name}>
+                  {district.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
       </div>
 
@@ -45,7 +89,7 @@ const Dashboard = () => {
         <div className="space-y-6">
           <div>
             <h2 className="dashboard-title">Real-Time Monitoring</h2>
-            <RealTimeMonitoring />
+            <RealTimeMonitoring selectedDistrict={selectedDistrict === "all" ? undefined : selectedDistrict} />
           </div>
 
           <div>
@@ -59,14 +103,15 @@ const Dashboard = () => {
         <div>
           <h2 className="dashboard-title">High Risk Districts</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            {/* Show only top 4 districts by risk score */}
-            {[...districts]
-              .sort((a, b) => b.riskScore - a.riskScore)
-              .slice(0, 4)
-              .map((district) => (
-                <DistrictRiskCard key={district.id} district={district} />
-              ))}
+            {topRiskDistricts.map((district) => (
+              <DistrictRiskCard key={district.id} district={district} />
+            ))}
           </div>
+          {selectedDistrict !== "all" && topRiskDistricts.length === 0 && (
+            <div className="text-center p-4 text-muted-foreground">
+              No district data available for the selected filter
+            </div>
+          )}
         </div>
 
         <div>
@@ -77,11 +122,11 @@ const Dashboard = () => {
             </TabsList>
             <TabsContent value="risk">
               <h2 className="dashboard-title">District Risk Score Table</h2>
-              <RiskScoreTable />
+              <RiskScoreTable districts={filteredDistricts} />
             </TabsContent>
             <TabsContent value="amount">
               <h2 className="dashboard-title">District Fraud Amount Table</h2>
-              <RiskScoreTable />
+              <RiskScoreTable districts={filteredDistricts} />
               {/* In a real application, this would be a separate table sorted by fraud amount */}
             </TabsContent>
           </Tabs>

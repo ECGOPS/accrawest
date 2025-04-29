@@ -1,56 +1,59 @@
 
-import { districts, formatCurrency, getRiskLevel } from "@/utils/mockData";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
+import { 
+  Table, 
+  TableBody, 
+  TableCell, 
+  TableHead, 
+  TableHeader, 
+  TableRow 
 } from "@/components/ui/table";
+import { formatCurrency, District, getRiskLevel } from "@/utils/mockData";
 
-const RiskScoreTable = () => {
-  // Sort districts by risk score in descending order
+interface RiskScoreTableProps {
+  districts?: District[];
+}
+
+const RiskScoreTable = ({ districts = [] }: RiskScoreTableProps) => {
+  // Sort districts by risk score (highest first)
   const sortedDistricts = [...districts].sort((a, b) => b.riskScore - a.riskScore);
 
   return (
-    <div className="border rounded-md overflow-hidden">
+    <div className="rounded-md border">
       <Table>
         <TableHeader>
-          <TableRow className="bg-ecg-blue text-white">
-            <TableHead className="text-white">District</TableHead>
-            <TableHead className="text-right text-white">Risk Score</TableHead>
-            <TableHead className="text-right text-white">Fraud Amount</TableHead>
-            <TableHead className="text-right text-white">% of Total</TableHead>
-            <TableHead className="text-right text-white">Outstanding</TableHead>
-            <TableHead className="text-right text-white">Payment Ratio</TableHead>
+          <TableRow>
+            <TableHead>District</TableHead>
+            <TableHead>Risk Score</TableHead>
+            <TableHead className="hidden md:table-cell">Fraud Amount</TableHead>
+            <TableHead className="hidden md:table-cell">% of Total</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
-          {sortedDistricts.map((district) => {
-            const riskLevel = getRiskLevel(district.riskScore);
-            
-            return (
-              <TableRow key={district.id}>
-                <TableCell className="font-medium">{district.name}</TableCell>
-                <TableCell className={`text-right risk-${riskLevel}`}>
-                  {district.riskScore.toFixed(2)}
-                </TableCell>
-                <TableCell className="text-right">
-                  {formatCurrency(district.fraudAmount)}
-                </TableCell>
-                <TableCell className="text-right">
-                  {district.fraudPercentage.toFixed(2)}%
-                </TableCell>
-                <TableCell className="text-right">
-                  {formatCurrency(district.outstandingBalance)}
-                </TableCell>
-                <TableCell className="text-right">
-                  {(district.paymentRatio * 100).toFixed(1)}%
-                </TableCell>
-              </TableRow>
-            );
-          })}
+          {sortedDistricts.length > 0 ? (
+            sortedDistricts.map((district) => {
+              const riskLevel = getRiskLevel(district.riskScore);
+              
+              return (
+                <TableRow key={district.id}>
+                  <TableCell className="font-medium">{district.name}</TableCell>
+                  <TableCell>
+                    <div className="flex items-center">
+                      <span className={`inline-block w-2 h-2 rounded-full bg-risk-${riskLevel} mr-2`}></span>
+                      <span>{district.riskScore.toFixed(2)}</span>
+                    </div>
+                  </TableCell>
+                  <TableCell className="hidden md:table-cell">{formatCurrency(district.fraudAmount)}</TableCell>
+                  <TableCell className="hidden md:table-cell">{district.fraudPercentage.toFixed(2)}%</TableCell>
+                </TableRow>
+              );
+            })
+          ) : (
+            <TableRow>
+              <TableCell colSpan={4} className="text-center py-4">
+                No district data available for the selected filter
+              </TableCell>
+            </TableRow>
+          )}
         </TableBody>
       </Table>
     </div>
