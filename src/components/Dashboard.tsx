@@ -12,13 +12,20 @@ import { districts } from "@/utils/mockData";
 const Dashboard = () => {
   return (
     <div className="mx-auto max-w-7xl p-4 sm:p-6">
-      <div className="flex flex-col gap-1 mb-8">
-        <h1 className="text-3xl font-bold text-ecg-blue">
-          ECG Accra West Fraud Detection Dashboard
-        </h1>
-        <p className="text-muted-foreground">
-          Visualizing fraud data across eight districts to enhance detection and prevention efforts
-        </p>
+      <div className="flex items-center gap-4 mb-8">
+        <img
+          src="/lovable-uploads/438f5028-fcfe-44a6-bce8-869971d52767.png"
+          alt="ECG Ghana Ltd Logo"
+          className="h-16 w-16"
+        />
+        <div className="flex flex-col gap-1">
+          <h1 className="text-3xl font-bold text-ecg-blue">
+            ECG Accra West Fraud Detection Dashboard
+          </h1>
+          <p className="text-muted-foreground">
+            Visualizing fraud data across eight districts to enhance detection and prevention efforts
+          </p>
+        </div>
       </div>
 
       <div className="dashboard-section">
@@ -81,12 +88,12 @@ const Dashboard = () => {
         </div>
       </div>
 
-      <div className="mt-8 text-sm text-muted-foreground">
-        <p>
-          This dashboard provides insights based on analysis of fraud data across ECG Accra West's eight districts. 
-          For detailed implementation of the big data analytics architecture and district-specific strategies, 
-          please refer to the complete fraud detection model documentation.
-        </p>
+      <div className="mt-8 flex justify-center">
+        <img 
+          src="/lovable-uploads/438f5028-fcfe-44a6-bce8-869971d52767.png" 
+          alt="ECG Ghana Ltd Logo"
+          className="h-14 w-14 opacity-70" 
+        />
       </div>
     </div>
   );
