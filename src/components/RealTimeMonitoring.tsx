@@ -13,7 +13,7 @@ import {
   AlertTriangle, 
   Activity, 
   Zap, 
-  Tool, 
+  Wrench, 
   Cable, 
   Network, 
   ChevronRight 
@@ -51,7 +51,7 @@ const RealTimeMonitoring = () => {
       case "meter_bypass":
         return <Zap className="h-4 w-4 text-red-600" />;
       case "meter_tampering":
-        return <Tool className="h-4 w-4 text-amber-600" />;
+        return <Wrench className="h-4 w-4 text-amber-600" />;
       case "direct_connection":
         return <Cable className="h-4 w-4 text-blue-600" />;
       case "unauthorized_connection":
