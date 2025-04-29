@@ -6,6 +6,7 @@ import FraudTypeCard from "./FraudTypeCard";
 import DistrictRiskCard from "./DistrictRiskCard";
 import RiskScoreTable from "./RiskScoreTable";
 import FraudMap from "./FraudMap";
+import RealTimeMonitoring from "./RealTimeMonitoring";
 import { districts } from "@/utils/mockData";
 
 const Dashboard = () => {
@@ -24,7 +25,7 @@ const Dashboard = () => {
         <MetricsOverview />
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 dashboard-section">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 dashboard-section mt-6">
         <div>
           <h2 className="dashboard-title">Fraud Type Analysis</h2>
           <div className="space-y-4">
@@ -36,41 +37,48 @@ const Dashboard = () => {
 
         <div className="space-y-6">
           <div>
-            <h2 className="dashboard-title">Geographic Risk Assessment</h2>
-            <FraudMap />
+            <h2 className="dashboard-title">Real-Time Monitoring</h2>
+            <RealTimeMonitoring />
           </div>
 
           <div>
-            <h2 className="dashboard-title">High Risk Districts</h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              {/* Show only top 4 districts by risk score */}
-              {[...districts]
-                .sort((a, b) => b.riskScore - a.riskScore)
-                .slice(0, 4)
-                .map((district) => (
-                  <DistrictRiskCard key={district.id} district={district} />
-                ))}
-            </div>
+            <h2 className="dashboard-title">Geographic Risk Assessment</h2>
+            <FraudMap />
           </div>
         </div>
       </div>
 
-      <div className="dashboard-section">
-        <Tabs defaultValue="risk">
-          <TabsList className="mb-4">
-            <TabsTrigger value="risk">Risk Score Ranking</TabsTrigger>
-            <TabsTrigger value="amount">Fraud Amount Ranking</TabsTrigger>
-          </TabsList>
-          <TabsContent value="risk">
-            <h2 className="dashboard-title">District Risk Score Table</h2>
-            <RiskScoreTable />
-          </TabsContent>
-          <TabsContent value="amount">
-            <h2 className="dashboard-title">District Fraud Amount Table</h2>
-            <RiskScoreTable />
-            {/* In a real application, this would be a separate table sorted by fraud amount */}
-          </TabsContent>
-        </Tabs>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 dashboard-section">
+        <div>
+          <h2 className="dashboard-title">High Risk Districts</h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            {/* Show only top 4 districts by risk score */}
+            {[...districts]
+              .sort((a, b) => b.riskScore - a.riskScore)
+              .slice(0, 4)
+              .map((district) => (
+                <DistrictRiskCard key={district.id} district={district} />
+              ))}
+          </div>
+        </div>
+
+        <div>
+          <Tabs defaultValue="risk">
+            <TabsList className="mb-4">
+              <TabsTrigger value="risk">Risk Score Ranking</TabsTrigger>
+              <TabsTrigger value="amount">Fraud Amount Ranking</TabsTrigger>
+            </TabsList>
+            <TabsContent value="risk">
+              <h2 className="dashboard-title">District Risk Score Table</h2>
+              <RiskScoreTable />
+            </TabsContent>
+            <TabsContent value="amount">
+              <h2 className="dashboard-title">District Fraud Amount Table</h2>
+              <RiskScoreTable />
+              {/* In a real application, this would be a separate table sorted by fraud amount */}
+            </TabsContent>
+          </Tabs>
+        </div>
       </div>
 
       <div className="mt-8 text-sm text-muted-foreground">
