@@ -1,4 +1,3 @@
-
 // Mock data for the ECG Fraud Detection Dashboard
 
 export interface FraudType {
@@ -21,6 +20,16 @@ export interface District {
   outstandingBalance: number;
   paymentRatio: number;
   consumptionCostRatio: number;
+}
+
+export interface DistrictFraudType {
+  districtId: number;
+  fraudTypeId: number;
+  amount: number;
+  percentage: number;
+  consumptionRatio: number;
+  paymentRate: number;
+  energyChargeRatio: number;
 }
 
 // Fraud Types
@@ -169,6 +178,57 @@ export const districts: District[] = [
     paymentRatio: 0.49,
     consumptionCostRatio: 0.66
   }
+];
+
+// District-specific fraud type data
+export const districtFraudTypes: DistrictFraudType[] = [
+  // NSAWAM
+  { districtId: 1, fraudTypeId: 1, amount: 18123456.78, percentage: 72.5, consumptionRatio: 0.6199, paymentRate: 52.70, energyChargeRatio: 0.8049 },
+  { districtId: 1, fraudTypeId: 2, amount: 6545678.90, percentage: 26.2, consumptionRatio: 0.6441, paymentRate: 48.44, energyChargeRatio: 0.7185 },
+  { districtId: 1, fraudTypeId: 3, amount: 219876.54, percentage: 0.88, consumptionRatio: 0.6754, paymentRate: 38.24, energyChargeRatio: 0.8156 },
+  { districtId: 1, fraudTypeId: 4, amount: 29337.16, percentage: 0.12, consumptionRatio: 0.6755, paymentRate: 23.06, energyChargeRatio: 0.8036 },
+
+  // ACHIMOTA
+  { districtId: 2, fraudTypeId: 1, amount: 7056789.01, percentage: 72.6, consumptionRatio: 0.6199, paymentRate: 52.70, energyChargeRatio: 0.8049 },
+  { districtId: 2, fraudTypeId: 2, amount: 2567890.12, percentage: 26.4, consumptionRatio: 0.6441, paymentRate: 48.44, energyChargeRatio: 0.7185 },
+  { districtId: 2, fraudTypeId: 3, amount: 87654.32, percentage: 0.90, consumptionRatio: 0.6754, paymentRate: 38.24, energyChargeRatio: 0.8156 },
+  { districtId: 2, fraudTypeId: 4, amount: 11657.35, percentage: 0.12, consumptionRatio: 0.6755, paymentRate: 23.06, energyChargeRatio: 0.8036 },
+
+  // KANESHIE
+  { districtId: 3, fraudTypeId: 1, amount: 4034567.89, percentage: 72.6, consumptionRatio: 0.6199, paymentRate: 52.70, energyChargeRatio: 0.8049 },
+  { districtId: 3, fraudTypeId: 2, amount: 1467890.12, percentage: 26.4, consumptionRatio: 0.6441, paymentRate: 48.44, energyChargeRatio: 0.7185 },
+  { districtId: 3, fraudTypeId: 3, amount: 50000.00, percentage: 0.90, consumptionRatio: 0.6754, paymentRate: 38.24, energyChargeRatio: 0.8156 },
+  { districtId: 3, fraudTypeId: 4, amount: 6666.67, percentage: 0.12, consumptionRatio: 0.6755, paymentRate: 23.06, energyChargeRatio: 0.8036 },
+
+  // DANSOMAN
+  { districtId: 4, fraudTypeId: 1, amount: 3965432.10, percentage: 72.6, consumptionRatio: 0.6199, paymentRate: 52.70, energyChargeRatio: 0.8049 },
+  { districtId: 4, fraudTypeId: 2, amount: 1444444.44, percentage: 26.4, consumptionRatio: 0.6441, paymentRate: 48.44, energyChargeRatio: 0.7185 },
+  { districtId: 4, fraudTypeId: 3, amount: 49382.72, percentage: 0.90, consumptionRatio: 0.6754, paymentRate: 38.24, energyChargeRatio: 0.8156 },
+  { districtId: 4, fraudTypeId: 4, amount: 6584.36, percentage: 0.12, consumptionRatio: 0.6755, paymentRate: 23.06, energyChargeRatio: 0.8036 },
+
+  // BORTIANOR
+  { districtId: 5, fraudTypeId: 1, amount: 2476543.21, percentage: 72.6, consumptionRatio: 0.6199, paymentRate: 52.70, energyChargeRatio: 0.8049 },
+  { districtId: 5, fraudTypeId: 2, amount: 901234.57, percentage: 26.4, consumptionRatio: 0.6441, paymentRate: 48.44, energyChargeRatio: 0.7185 },
+  { districtId: 5, fraudTypeId: 3, amount: 30864.20, percentage: 0.90, consumptionRatio: 0.6754, paymentRate: 38.24, energyChargeRatio: 0.8156 },
+  { districtId: 5, fraudTypeId: 4, amount: 4115.23, percentage: 0.12, consumptionRatio: 0.6755, paymentRate: 23.06, energyChargeRatio: 0.8036 },
+
+  // ABLEKUMA
+  { districtId: 6, fraudTypeId: 1, amount: 1162962.54, percentage: 72.6, consumptionRatio: 0.6199, paymentRate: 52.70, energyChargeRatio: 0.8049 },
+  { districtId: 6, fraudTypeId: 2, amount: 423456.79, percentage: 26.4, consumptionRatio: 0.6441, paymentRate: 48.44, energyChargeRatio: 0.7185 },
+  { districtId: 6, fraudTypeId: 3, amount: 14382.72, percentage: 0.90, consumptionRatio: 0.6754, paymentRate: 38.24, energyChargeRatio: 0.8156 },
+  { districtId: 6, fraudTypeId: 4, amount: 1917.70, percentage: 0.12, consumptionRatio: 0.6755, paymentRate: 23.06, energyChargeRatio: 0.8036 },
+
+  // AMASAMAN
+  { districtId: 7, fraudTypeId: 1, amount: 1046543.21, percentage: 72.6, consumptionRatio: 0.6199, paymentRate: 52.70, energyChargeRatio: 0.8049 },
+  { districtId: 7, fraudTypeId: 2, amount: 380864.20, percentage: 26.4, consumptionRatio: 0.6441, paymentRate: 48.44, energyChargeRatio: 0.7185 },
+  { districtId: 7, fraudTypeId: 3, amount: 12962.96, percentage: 0.90, consumptionRatio: 0.6754, paymentRate: 38.24, energyChargeRatio: 0.8156 },
+  { districtId: 7, fraudTypeId: 4, amount: 1728.39, percentage: 0.12, consumptionRatio: 0.6755, paymentRate: 23.06, energyChargeRatio: 0.8036 },
+
+  // KORLE-BU
+  { districtId: 8, fraudTypeId: 1, amount: 844444.44, percentage: 72.6, consumptionRatio: 0.6199, paymentRate: 52.70, energyChargeRatio: 0.8049 },
+  { districtId: 8, fraudTypeId: 2, amount: 307407.41, percentage: 26.4, consumptionRatio: 0.6441, paymentRate: 48.44, energyChargeRatio: 0.7185 },
+  { districtId: 8, fraudTypeId: 3, amount: 10466.67, percentage: 0.90, consumptionRatio: 0.6754, paymentRate: 38.24, energyChargeRatio: 0.8156 },
+  { districtId: 8, fraudTypeId: 4, amount: 1395.56, percentage: 0.12, consumptionRatio: 0.6755, paymentRate: 23.06, energyChargeRatio: 0.8036 },
 ];
 
 // Dashboard summary metrics

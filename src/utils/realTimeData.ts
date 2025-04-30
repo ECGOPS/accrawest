@@ -1,16 +1,30 @@
-
 import { districts } from './mockData';
 
 // Types for real-time anomaly data
 export interface AnomalyData {
+  id: string;
   districtId: number;
-  timestamp: Date;
   anomalyType: 'meter_bypass' | 'meter_tampering' | 'direct_connection' | 'unauthorized_connection';
-  severity: 'low' | 'medium' | 'high';
+  description: string;
   value: number;
   threshold: number;
-  description: string;
+  severity: 'low' | 'medium' | 'high';
+  timestamp: string;
+  meterNumber?: string;  // Optional meter number property
+  customerName?: string;
 }
+
+// Mock customer data
+const mockCustomers = [
+  { meterNumber: 'P19100001', name: 'John Doe' },
+  { meterNumber: 'P19100002', name: 'Jane Smith' },
+  { meterNumber: 'P19100003', name: 'Robert Johnson' },
+  { meterNumber: 'P19100004', name: 'Sarah Williams' },
+  { meterNumber: 'P19100005', name: 'Michael Brown' },
+  { meterNumber: 'P19100006', name: 'Emily Davis' },
+  { meterNumber: 'P19100007', name: 'David Wilson' },
+  { meterNumber: 'P19100008', name: 'Lisa Anderson' }
+];
 
 // Function to generate random anomalies for demo purposes
 export const generateRandomAnomalies = (count: number = 1): AnomalyData[] => {
@@ -52,15 +66,23 @@ export const generateRandomAnomalies = (count: number = 1): AnomalyData[] => {
       threshold = 25;
       value = Math.round(threshold + Math.random() * 15);
     }
+
+    // Get a random customer for meter-related anomalies
+    const customer = type !== 'unauthorized_connection' 
+      ? mockCustomers[Math.floor(Math.random() * mockCustomers.length)]
+      : undefined;
     
     anomalies.push({
+      id: Date.now().toString() + Math.random().toString(36).substr(2, 9),
       districtId: district.id,
-      timestamp: new Date(),
+      timestamp: new Date().toISOString(),
       anomalyType: type,
       severity,
       value,
       threshold,
       description: descriptions[type],
+      meterNumber: customer?.meterNumber,
+      customerName: customer?.name
     });
   }
   

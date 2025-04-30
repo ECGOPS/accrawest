@@ -1,19 +1,86 @@
-
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { AlertCircle, AlertTriangle, Zap, Wrench } from "lucide-react";
 import { AnomalyData, fetchRealTimeAnomalies } from "@/utils/realTimeData";
 import { useToast } from "@/hooks/use-toast";
 import { districts } from "@/utils/mockData";
+import { Badge } from "./ui/badge";
+import React from "react";
 
 interface RealTimeMonitoringProps {
   selectedDistrict?: string;
+  onNewCase?: (anomaly: AnomalyData) => void;
 }
 
-const RealTimeMonitoring = ({ selectedDistrict }: RealTimeMonitoringProps) => {
+const RealTimeMonitoring = ({ selectedDistrict, onNewCase }: RealTimeMonitoringProps) => {
   const [anomalies, setAnomalies] = useState<AnomalyData[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
+  const lastToastTime = useRef<number>(0);
+  const TOAST_COOLDOWN = 5000; // 5 seconds cooldown between toasts
+  const wsRef = useRef<WebSocket | null>(null);
+
+  // Mock meter numbers and customer names for demonstration
+  const mockMeters = [
+    { number: 'P19100001', name: 'John Doe' },
+    { number: 'P19100002', name: 'Jane Smith' },
+    { number: 'P19100003', name: 'Robert Johnson' },
+    { number: 'P19100004', name: 'Sarah Williams' },
+    { number: 'P19100005', name: 'Michael Brown' },
+    { number: 'P19100006', name: 'Emily Davis' },
+    { number: 'P19100007', name: 'David Wilson' },
+    { number: 'P19100008', name: 'Lisa Anderson' }
+  ];
+
+  // Mock anomalies for demonstration
+  const mockAnomalies: AnomalyData[] = [
+    {
+      id: '1',
+      districtId: 1,
+      anomalyType: 'meter_bypass',
+      description: 'Meter bypass detected',
+      value: 28,
+      threshold: 25,
+      severity: 'high',
+      timestamp: new Date().toISOString(),
+      meterNumber: 'P19100001',
+      customerName: 'John Doe'
+    },
+    {
+      id: '2',
+      districtId: 2,
+      anomalyType: 'meter_tampering',
+      description: 'Meter tampering detected',
+      value: 22,
+      threshold: 20,
+      severity: 'medium',
+      timestamp: new Date().toISOString(),
+      meterNumber: 'P19100002',
+      customerName: 'Jane Smith'
+    },
+    {
+      id: '3',
+      districtId: 3,
+      anomalyType: 'direct_connection',
+      description: 'Direct connection detected',
+      value: 18,
+      threshold: 15,
+      severity: 'low',
+      timestamp: new Date().toISOString(),
+      meterNumber: 'P19100003',
+      customerName: 'Robert Johnson'
+    },
+    {
+      id: '4',
+      districtId: 4,
+      anomalyType: 'unauthorized_connection',
+      description: 'Unauthorized service connection detected',
+      value: 0,
+      threshold: 0,
+      severity: 'high',
+      timestamp: new Date().toISOString()
+    }
+  ];
 
   // Function to get district name from ID
   const getDistrictName = (id: number) => {
@@ -25,15 +92,15 @@ const RealTimeMonitoring = ({ selectedDistrict }: RealTimeMonitoringProps) => {
   const getAnomalyIcon = (type: string) => {
     switch (type) {
       case 'meter_bypass':
-        return <Zap className="h-5 w-5 text-orange-500" />;
+        return <Wrench className="h-4 w-4 text-red-500" />;
       case 'meter_tampering':
-        return <Wrench className="h-5 w-5 text-blue-500" />;
+        return <Wrench className="h-4 w-4 text-yellow-500" />;
       case 'direct_connection':
-        return <AlertCircle className="h-5 w-5 text-red-500" />;
+        return <Zap className="h-4 w-4 text-red-500" />;
       case 'unauthorized_connection':
-        return <AlertTriangle className="h-5 w-5 text-yellow-500" />;
+        return <AlertCircle className="h-4 w-4 text-red-500" />;
       default:
-        return <AlertCircle className="h-5 w-5 text-gray-500" />;
+        return <AlertTriangle className="h-4 w-4 text-gray-500" />;
     }
   };
 
@@ -84,14 +151,28 @@ const RealTimeMonitoring = ({ selectedDistrict }: RealTimeMonitoringProps) => {
         if (filteredAnomalies.length > 0) {
           setAnomalies(prev => [...filteredAnomalies, ...prev].slice(0, 5));
           
-          // Show toast notification for new anomalies
-          filteredAnomalies.forEach(anomaly => {
-            const districtName = getDistrictName(anomaly.districtId);
-            toast({
-              title: `${getAnomalyTypeDisplay(anomaly.anomalyType)} - ${anomaly.severity} severity`,
-              description: `New Anomaly Detected in ${districtName}`,
+          // Show toast notification for new anomalies and create cases for high severity
+          const now = Date.now();
+          if (now - lastToastTime.current >= TOAST_COOLDOWN) {
+            filteredAnomalies.forEach(anomaly => {
+              const districtName = getDistrictName(anomaly.districtId);
+              const meterInfo = anomaly.meterNumber ? ` (Meter: ${anomaly.meterNumber})` : '';
+              const caseTitle = `${getAnomalyTypeDisplay(anomaly.anomalyType)} in ${districtName}${meterInfo}`;
+              const caseDescription = `High severity anomaly detected: ${anomaly.description}\nValue: ${anomaly.value} (Threshold: ${anomaly.threshold})`;
+
+              toast({
+                title: "High Severity Anomaly Detected",
+                description: `${caseTitle}\n${caseDescription}`,
+                variant: "destructive",
+              });
+
+              // Automatically create a case for high severity anomalies
+              if (anomaly.severity === 'high' && onNewCase) {
+                onNewCase(anomaly);
+              }
             });
-          });
+            lastToastTime.current = now;
+          }
         }
       } catch (error) {
         console.error("Error fetching real-time data:", error);
@@ -107,54 +188,84 @@ const RealTimeMonitoring = ({ selectedDistrict }: RealTimeMonitoringProps) => {
     const intervalId = setInterval(fetchData, 15000);
 
     return () => clearInterval(intervalId);
-  }, [toast, selectedDistrict]);
+  }, [toast, selectedDistrict, onNewCase]);
+
+  const handleNewAnomaly = (anomaly: AnomalyData) => {
+    setAnomalies(prev => [anomaly, ...prev]);
+    
+    // Show toast notification with customer name if available
+    toast({
+      title: `New ${anomaly.severity} severity anomaly detected`,
+      description: `${anomaly.anomalyType} in ${anomaly.districtId}${anomaly.meterNumber ? ` - Meter: ${anomaly.meterNumber} (${anomaly.customerName})` : ''}`,
+      variant: anomaly.severity === 'high' ? 'destructive' : 'default',
+    });
+  };
 
   return (
-    <Card>
-      <CardContent className="pt-4">
-        <div className="flex items-center justify-between mb-3">
+    <Card className="w-full">
+      <CardContent className="p-4">
+        <div className="flex items-center justify-between mb-4">
           <div className="flex items-center space-x-2">
-            <h3 className="font-medium text-sm">Anomaly Feed</h3>
-            {isLoading && (
-              <span className="ml-2 inline-block h-2 w-2 animate-pulse rounded-full bg-ecg-red"></span>
-            )}
+            <h3 className="font-medium">Real-Time Monitoring</h3>
+            <Badge variant="destructive" className="animate-pulse">
+              Live
+            </Badge>
           </div>
           <span className="text-xs text-muted-foreground">Refreshes every 15s</span>
         </div>
+        <div className="space-y-4">
+          {anomalies.map((anomaly) => {
+            const districtName = districts.find(d => d.id === anomaly.districtId)?.name || 'Unknown';
+            const meterInfo = anomaly.meterNumber ? ` (Meter: ${anomaly.meterNumber} - ${anomaly.customerName})` : '';
+            
+            // Get severity-based styles
+            const severityStyles = {
+              high: {
+                container: 'bg-red-50 border-red-200',
+                text: 'text-red-700',
+                icon: 'text-red-500'
+              },
+              medium: {
+                container: 'bg-yellow-50 border-yellow-200',
+                text: 'text-yellow-700',
+                icon: 'text-yellow-500'
+              },
+              low: {
+                container: 'bg-green-50 border-green-200',
+                text: 'text-green-700',
+                icon: 'text-green-500'
+              }
+            };
 
-        <div className="space-y-3 max-h-[260px] overflow-y-auto pr-1">
-          {anomalies.length > 0 ? (
-            anomalies.map((anomaly, index) => (
+            const styles = severityStyles[anomaly.severity];
+            
+            return (
               <div
-                key={index}
-                className="relative flex items-start space-x-3 bg-muted/40 p-3 rounded-md"
+                key={anomaly.id}
+                className={`flex items-start justify-between p-3 rounded-lg border-2 ${styles.container}`}
               >
-                <div className="flex-shrink-0">
-                  {getAnomalyIcon(anomaly.anomalyType)}
+                <div className="flex items-start space-x-3">
+                  {React.cloneElement(getAnomalyIcon(anomaly.anomalyType), {
+                    className: `${styles.icon} h-4 w-4`
+                  })}
+                  <div>
+                    <div className={`font-medium ${styles.text}`}>
+                      {getAnomalyTypeDisplay(anomaly.anomalyType)} in {districtName}{meterInfo}
+                    </div>
+                    <div className={`text-sm ${styles.text}`}>
+                      {anomaly.description}
+                    </div>
+                    <div className={`text-sm ${styles.text}`}>
+                      Value: {anomaly.value} (Threshold: {anomaly.threshold})
+                    </div>
+                  </div>
                 </div>
-                <div>
-                  <p className="text-sm font-medium">
-                    {getAnomalyTypeDisplay(anomaly.anomalyType)}{" "}
-                    <span className={getSeverityClass(anomaly.severity)}>
-                      ({anomaly.severity})
-                    </span>
-                  </p>
-                  <p className="text-xs text-muted-foreground">
-                    {getDistrictName(anomaly.districtId)} District
-                  </p>
-                  <p className="text-xs">
-                    Value: {anomaly.value} (Threshold: {anomaly.threshold})
-                  </p>
-                </div>
+                <Badge variant={anomaly.severity === 'high' ? 'destructive' : 'default'}>
+                  {anomaly.severity.toUpperCase()}
+                </Badge>
               </div>
-            ))
-          ) : (
-            <div className="text-center p-4 text-muted-foreground text-sm">
-              {selectedDistrict ? 
-                `No anomalies detected in ${selectedDistrict} district` : 
-                "No anomalies detected"}
-            </div>
-          )}
+            );
+          })}
         </div>
       </CardContent>
     </Card>
