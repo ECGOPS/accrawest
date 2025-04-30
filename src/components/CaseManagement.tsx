@@ -31,17 +31,39 @@ interface Case {
 }
 
 const CaseManagement: React.FC = () => {
+  const teamMembers = [
+    'Kofi Sarkodie',
+    'Cyril Ameko',
+    'Kenneth Kofi Davordzie'
+  ];
+
   const [cases, setCases] = useState<Case[]>([]);
   const [filteredCases, setFilteredCases] = useState<Case[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('all');
+  const [selectedAssignee, setSelectedAssignee] = useState<string>('');
   const { toast } = useToast();
 
   // Load cases from localStorage on component mount
   useEffect(() => {
     const savedCases = localStorage.getItem('cases');
     if (savedCases) {
-      setCases(JSON.parse(savedCases));
+      const parsedCases = JSON.parse(savedCases);
+      // Update any unassigned cases with team members
+      const updatedCases = parsedCases.map((caseItem: Case) => {
+        if (caseItem.assignedTo === 'Unassigned') {
+          // Assign to Kofi Sarkodie by default if unassigned
+          return {
+            ...caseItem,
+            assignedTo: teamMembers[0],
+            lastUpdated: new Date().toISOString().split('T')[0]
+          };
+        }
+        return caseItem;
+      });
+      setCases(updatedCases);
+      // Save the updated cases back to localStorage
+      localStorage.setItem('cases', JSON.stringify(updatedCases));
     }
   }, []);
 
@@ -73,35 +95,45 @@ const CaseManagement: React.FC = () => {
     title: string;
     description: string;
     priority: 'Low' | 'Medium' | 'High' | 'Critical';
+    assignedTo: string;
   }>({
     title: '',
     description: '',
     priority: 'Medium',
+    assignedTo: teamMembers[0]
   });
 
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
   const handleCreateCase = () => {
-    if (!newCase.title.trim() || !newCase.description.trim()) {
+    if (!newCase.title.trim() || !newCase.description.trim() || !newCase.assignedTo) {
       toast({
         title: "Error",
-        description: "Please fill in all required fields",
+        description: "Please fill in all required fields including assignee",
         variant: "destructive",
       });
       return;
     }
 
+    // Ensure assignedTo is not 'Unassigned'
+    const assignedTo = newCase.assignedTo === 'Unassigned' ? teamMembers[0] : newCase.assignedTo;
+
     const caseToAdd: Case = {
       id: Date.now().toString(),
       ...newCase,
+      assignedTo,
       status: 'Open',
-      assignedTo: 'Unassigned',
       createdAt: new Date().toISOString().split('T')[0],
       lastUpdated: new Date().toISOString().split('T')[0],
     };
     
     setCases(prev => [...prev, caseToAdd]);
-    setNewCase({ title: '', description: '', priority: 'Medium' });
+    setNewCase({ 
+      title: '', 
+      description: '', 
+      priority: 'Medium',
+      assignedTo: teamMembers[0]
+    });
     setIsDialogOpen(false);
     
     toast({
@@ -227,9 +259,15 @@ const CaseManagement: React.FC = () => {
                       </p>
                     )}
                   </div>
-                  <div className="flex flex-col sm:flex-row sm:justify-between text-xs sm:text-sm text-muted-foreground gap-2 mt-4">
-                    <span>Assigned to: {caseItem.assignedTo}</span>
-                    <span>Last updated: {caseItem.lastUpdated}</span>
+                  <div className="mt-2 text-sm text-muted-foreground">
+                    <div className="flex items-center gap-2">
+                      <span className="font-medium">Assigned to:</span>
+                      <span>{caseItem.assignedTo}</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span className="font-medium">Created:</span>
+                      <span>{caseItem.createdAt}</span>
+                    </div>
                   </div>
                   <div className="mt-4">
                     <Select
@@ -261,7 +299,7 @@ const CaseManagement: React.FC = () => {
       </div>
 
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
+        <DialogContent className="sm:max-w-[600px]">
           <DialogHeader>
             <DialogTitle>Create New Case</DialogTitle>
           </DialogHeader>
@@ -281,29 +319,53 @@ const CaseManagement: React.FC = () => {
                 className="min-h-[100px]"
               />
             </div>
-            <div className="space-y-2">
-              <Select
-                value={newCase.priority}
-                onValueChange={(value: 'Low' | 'Medium' | 'High' | 'Critical') => 
-                  setNewCase({ ...newCase, priority: value })}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Select Priority" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="Low">Low</SelectItem>
-                  <SelectItem value="Medium">Medium</SelectItem>
-                  <SelectItem value="High">High</SelectItem>
-                  <SelectItem value="Critical">Critical</SelectItem>
-                </SelectContent>
-              </Select>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Select
+                  value={newCase.priority}
+                  onValueChange={(value: Case['priority']) =>
+                    setNewCase({ ...newCase, priority: value })
+                  }
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select priority" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="Low">Low</SelectItem>
+                    <SelectItem value="Medium">Medium</SelectItem>
+                    <SelectItem value="High">High</SelectItem>
+                    <SelectItem value="Critical">Critical</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-2">
+                <Select
+                  value={newCase.assignedTo}
+                  onValueChange={(value: string) =>
+                    setNewCase({ ...newCase, assignedTo: value })
+                  }
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Assign to" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {teamMembers.map((member) => (
+                      <SelectItem key={member} value={member}>
+                        {member}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
             </div>
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setIsDialogOpen(false)}>
               Cancel
             </Button>
-            <Button onClick={handleCreateCase}>Create Case</Button>
+            <Button onClick={handleCreateCase} disabled={!newCase.title.trim() || !newCase.description.trim()}>
+              Create Case
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
