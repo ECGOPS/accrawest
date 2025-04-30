@@ -44,7 +44,7 @@ const WorkflowManagement: React.FC = () => {
           title: 'Initial Assessment',
           description: 'Review initial case details and evidence',
           status: 'Completed',
-          assignedTo: 'John Doe',
+          assignedTo: 'Kofi Sarkodie',
           dueDate: '2024-03-15',
         },
         {
@@ -52,7 +52,7 @@ const WorkflowManagement: React.FC = () => {
           title: 'Evidence Collection',
           description: 'Gather all relevant evidence and documentation',
           status: 'In Progress',
-          assignedTo: 'Jane Smith',
+          assignedTo: 'Cyril Ameko',
           dueDate: '2024-03-20',
         },
         {
@@ -60,7 +60,7 @@ const WorkflowManagement: React.FC = () => {
           title: 'Analysis',
           description: 'Analyze collected evidence and identify patterns',
           status: 'Pending',
-          assignedTo: 'Mike Johnson',
+          assignedTo: 'Kenneth Kofi Davordzie',
           dueDate: '2024-03-25',
         },
         {
@@ -68,7 +68,7 @@ const WorkflowManagement: React.FC = () => {
           title: 'Report Generation',
           description: 'Prepare final investigation report',
           status: 'Pending',
-          assignedTo: 'Sarah Wilson',
+          assignedTo: 'Kofi Sarkodie',
           dueDate: '2024-03-30',
         },
       ],

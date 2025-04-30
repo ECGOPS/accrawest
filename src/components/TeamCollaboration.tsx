@@ -57,21 +57,21 @@ const TeamCollaboration: React.FC = () => {
   const [teamMembers, setTeamMembers] = useState<TeamMember[]>([
     {
       id: '1',
-      name: 'John Doe',
+      name: 'Kofi Sarkodie',
       role: 'Admin',
       status: 'Online',
       permissions: rolePermissions['Admin'],
     },
     {
       id: '2',
-      name: 'Jane Smith',
+      name: 'Cyril Ameko',
       role: 'Analyst',
       status: 'Busy',
       permissions: rolePermissions['Analyst'],
     },
     {
       id: '3',
-      name: 'Mike Johnson',
+      name: 'Kenneth Kofi Davordzie',
       role: 'Field Agent',
       status: 'Offline',
       permissions: rolePermissions['Field Agent'],
