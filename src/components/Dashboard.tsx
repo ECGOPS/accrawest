@@ -134,9 +134,9 @@ const Dashboard = () => {
     <div className="mx-auto max-w-7xl p-2 sm:p-4">
       <div className="flex items-center gap-3 mb-4">
         <img
-          src="/ecg-uploads/ecg-logo.png"
-          alt="ECG Ghana Ltd Logo"
-          className="h-12 w-12"
+          src="/assets/new-logo.svg"
+          alt="Accra West Logo"
+          className="w-12 h-12"
         />
         <div className="flex flex-col gap-0.5">
           <h1 className="text-2xl font-bold text-ecg-blue">

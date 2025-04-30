@@ -41,9 +41,9 @@ const Login: React.FC<LoginProps> = ({ onLoginSuccess }) => {
         <div className="flex flex-col items-center justify-center space-y-2">
           <div className="w-32 h-32 relative mb-4">
             <img
-              src="/ecg-uploads/ecg-logo.png"
-              alt="ECG Logo"
-              className="w-full h-full object-contain"
+              src="/assets/new-logo.svg"
+              alt="Accra West Logo"
+              className="w-32 h-32 mb-8"
             />
           </div>
           <h2 className="text-2xl font-bold tracking-tight text-ecg-blue">Fraud Alert System</h2>
