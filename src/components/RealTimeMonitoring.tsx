@@ -6,6 +6,7 @@ import { useToast } from "@/hooks/use-toast";
 import { districts } from "@/utils/mockData";
 import { Badge } from "./ui/badge";
 import React from "react";
+import { cn } from "@/lib/utils";
 
 interface RealTimeMonitoringProps {
   selectedDistrict?: string;
@@ -158,7 +159,7 @@ const RealTimeMonitoring = ({ selectedDistrict, onNewCase }: RealTimeMonitoringP
               const districtName = getDistrictName(anomaly.districtId);
               const meterInfo = anomaly.meterNumber ? ` (Meter: ${anomaly.meterNumber})` : '';
               const caseTitle = `${getAnomalyTypeDisplay(anomaly.anomalyType)} in ${districtName}${meterInfo}`;
-              const caseDescription = `High severity anomaly detected: ${anomaly.description}\nValue: ${anomaly.value} (Threshold: ${anomaly.threshold})`;
+              const caseDescription = `High severity anomaly detected: ${anomaly.description}\nConsumption: ${anomaly.value} kWh (Threshold: ${anomaly.threshold} kWh)`;
 
               toast({
                 title: "High Severity Anomaly Detected",
@@ -216,7 +217,7 @@ const RealTimeMonitoring = ({ selectedDistrict, onNewCase }: RealTimeMonitoringP
         <div className="space-y-4">
           {anomalies.map((anomaly) => {
             const districtName = districts.find(d => d.id === anomaly.districtId)?.name || 'Unknown';
-            const meterInfo = anomaly.meterNumber ? ` (Meter: ${anomaly.meterNumber} - ${anomaly.customerName})` : '';
+            const meterInfo = anomaly.meterNumber ? ` (Meter: ${anomaly.meterNumber})` : '';
             
             // Get severity-based styles
             const severityStyles = {
@@ -248,21 +249,37 @@ const RealTimeMonitoring = ({ selectedDistrict, onNewCase }: RealTimeMonitoringP
                   {React.cloneElement(getAnomalyIcon(anomaly.anomalyType), {
                     className: `${styles.icon} h-4 w-4`
                   })}
-                  <div>
-                    <div className={`font-medium ${styles.text}`}>
-                      {getAnomalyTypeDisplay(anomaly.anomalyType)} in {districtName}{meterInfo}
+                  <div className="flex flex-col space-y-1">
+                    <div className="flex items-center gap-2">
+                      {getAnomalyIcon(anomaly.anomalyType)}
+                      <span className="font-medium">{getAnomalyTypeDisplay(anomaly.anomalyType)}</span>
                     </div>
-                    <div className={`text-sm ${styles.text}`}>
-                      {anomaly.description}
-                    </div>
-                    <div className={`text-sm ${styles.text}`}>
-                      Value: {anomaly.value} (Threshold: {anomaly.threshold})
-                    </div>
+                    <p className="text-sm text-muted-foreground">{anomaly.description}</p>
+                    <p className="text-sm">
+                      Consumption: {anomaly.value} kWh (Threshold: {anomaly.threshold} kWh)
+                    </p>
+                    {anomaly.meterNumber && (
+                      <p className="text-sm">
+                        Meter: {anomaly.meterNumber}
+                        {anomaly.customerName && ` - ${anomaly.customerName}`}
+                      </p>
+                    )}
+                    <p className="text-sm">
+                      District: {getDistrictName(anomaly.districtId)}
+                    </p>
+                    <Badge 
+                      variant="outline" 
+                      className={cn(
+                        "w-fit",
+                        anomaly.severity === 'high' ? 'border-red-500 text-red-500' :
+                        anomaly.severity === 'medium' ? 'border-yellow-500 text-yellow-500' :
+                        'border-green-500 text-green-500'
+                      )}
+                    >
+                      {anomaly.severity.charAt(0).toUpperCase() + anomaly.severity.slice(1)} Severity
+                    </Badge>
                   </div>
                 </div>
-                <Badge variant={anomaly.severity === 'high' ? 'destructive' : 'default'}>
-                  {anomaly.severity.toUpperCase()}
-                </Badge>
               </div>
             );
           })}

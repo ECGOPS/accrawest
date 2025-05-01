@@ -54,17 +54,17 @@ export const generateRandomAnomalies = (count: number = 1): AnomalyData[] => {
     const type = anomalyTypes[Math.floor(Math.random() * anomalyTypes.length)];
     const severity = severities[Math.floor(Math.random() * severities.length)];
     
-    // Generate values based on severity
+    // Generate values based on severity (consumption in kWh)
     let value, threshold;
     if (severity === 'high') {
-      threshold = 75;
-      value = Math.round(threshold + 10 + Math.random() * 15);
+      threshold = 1500;  // 1500 kWh threshold
+      value = Math.round(threshold + 300 + Math.random() * 500);  // 1800-2300 kWh
     } else if (severity === 'medium') {
-      threshold = 50;
-      value = Math.round(threshold + 5 + Math.random() * 20);
+      threshold = 1000;  // 1000 kWh threshold
+      value = Math.round(threshold + 100 + Math.random() * 300);  // 1100-1400 kWh
     } else {
-      threshold = 25;
-      value = Math.round(threshold + Math.random() * 15);
+      threshold = 500;   // 500 kWh threshold
+      value = Math.round(threshold + Math.random() * 200);  // 500-700 kWh
     }
 
     // Get a random customer for meter-related anomalies
