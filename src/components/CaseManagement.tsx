@@ -255,7 +255,7 @@ const CaseManagement: React.FC = () => {
                     )}
                     {caseItem.value !== undefined && caseItem.threshold !== undefined && (
                       <p className="text-xs sm:text-sm text-muted-foreground">
-                        Value: {caseItem.value} (Threshold: {caseItem.threshold})
+                        Consumption: {caseItem.value} kWh (Threshold: {caseItem.threshold} kWh)
                       </p>
                     )}
                   </div>

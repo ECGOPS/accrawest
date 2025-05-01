@@ -83,7 +83,7 @@ const Dashboard = () => {
   const handleNewCase = (anomaly: AnomalyData) => {
     const districtName = districts.find(d => d.id === anomaly.districtId)?.name || 'Unknown';
     const caseTitle = `${getAnomalyTypeDisplay(anomaly.anomalyType)} in ${districtName}`;
-    const caseDescription = `High severity anomaly detected: ${anomaly.description}\nValue: ${anomaly.value} (Threshold: ${anomaly.threshold})`;
+    const caseDescription = `High severity anomaly detected: ${anomaly.description}\nConsumption: ${anomaly.value} kWh (Threshold: ${anomaly.threshold} kWh)`;
 
     // Get existing cases from localStorage
     const existingCases = JSON.parse(localStorage.getItem('cases') || '[]');
