@@ -82,8 +82,21 @@ const Dashboard = () => {
 
   const handleNewCase = (anomaly: AnomalyData) => {
     const districtName = districts.find(d => d.id === anomaly.districtId)?.name || 'Unknown';
-    const caseTitle = `${getAnomalyTypeDisplay(anomaly.anomalyType)} in ${districtName}`;
-    const caseDescription = `High severity anomaly detected: ${anomaly.description}\nConsumption: ${anomaly.value} kWh (Threshold: ${anomaly.threshold} kWh)`;
+    const consumptionDeficit = anomaly.threshold - anomaly.value;
+    const percentageBelow = ((consumptionDeficit) / anomaly.threshold) * 100;
+    
+    let severityText = '';
+    if (percentageBelow >= 90) severityText = 'Critical: Near-Zero Consumption';
+    else if (percentageBelow >= 70) severityText = 'Severe: Extremely Low Consumption';
+    else if (percentageBelow >= 50) severityText = 'Warning: Very Low Consumption';
+    else severityText = 'Alert: Below Expected Consumption';
+
+    const caseTitle = `${severityText} - ${getAnomalyTypeDisplay(anomaly.anomalyType)} in ${districtName}`;
+    const caseDescription = `Low consumption alert detected:\n` +
+      `Current Consumption: ${anomaly.value} kWh\n` +
+      `Expected Minimum: ${anomaly.threshold} kWh\n` +
+      `${percentageBelow.toFixed(1)}% below normal consumption\n\n` +
+      `${anomaly.description}`;
 
     // Get existing cases from localStorage
     const existingCases = JSON.parse(localStorage.getItem('cases') || '[]');
@@ -110,7 +123,7 @@ const Dashboard = () => {
     // Show toast notification
     toast({
       title: "New Case Created",
-      description: `A case has been automatically created for the high severity anomaly in ${districtName}`,
+      description: `A case has been automatically created for the low consumption alert in ${districtName}`,
       variant: "default",
     });
   };

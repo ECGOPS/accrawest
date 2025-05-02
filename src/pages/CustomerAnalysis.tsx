@@ -30,6 +30,7 @@ interface CustomerData {
   meterNumber: string;
   district: string;
   consumption: number;
+  expectedMinConsumption: number;
   paymentHistory: number[];
   riskScore: number;
   lastReading: string;
@@ -50,11 +51,12 @@ const CustomerAnalysis: React.FC = () => {
       accountNumber: 'ACC001',
       meterNumber: 'P19100001',
       district: 'NSAWAM',
-      consumption: 250,
+      consumption: 50,
+      expectedMinConsumption: 500,
       paymentHistory: [100, 95, 90, 85, 80],
       riskScore: 75,
       lastReading: '2024-03-15',
-      status: 'Suspicious',
+      status: 'High Risk',
     },
     {
       id: '2',
@@ -62,11 +64,12 @@ const CustomerAnalysis: React.FC = () => {
       accountNumber: 'ACC002',
       meterNumber: 'P19100002',
       district: 'ACHIMOTA',
-      consumption: 180,
+      consumption: 80,
+      expectedMinConsumption: 300,
       paymentHistory: [100, 100, 100, 100, 100],
-      riskScore: 20,
+      riskScore: 65,
       lastReading: '2024-03-16',
-      status: 'Normal',
+      status: 'Suspicious',
     },
     {
       id: '3',
@@ -74,7 +77,8 @@ const CustomerAnalysis: React.FC = () => {
       accountNumber: 'ACC003',
       meterNumber: 'P19100003',
       district: 'KANESHIE',
-      consumption: 500,
+      consumption: 120,
+      expectedMinConsumption: 200,
       paymentHistory: [60, 55, 50, 45, 40],
       riskScore: 90,
       lastReading: '2024-03-14',
@@ -87,6 +91,7 @@ const CustomerAnalysis: React.FC = () => {
       meterNumber: 'P19100004',
       district: 'DANSOMAN',
       consumption: 320,
+      expectedMinConsumption: 300,
       paymentHistory: [95, 90, 85, 80, 75],
       riskScore: 65,
       lastReading: '2024-03-17',
@@ -99,6 +104,7 @@ const CustomerAnalysis: React.FC = () => {
       meterNumber: 'P19100005',
       district: 'BORTIANOR',
       consumption: 150,
+      expectedMinConsumption: 300,
       paymentHistory: [100, 100, 100, 100, 100],
       riskScore: 15,
       lastReading: '2024-03-18',
@@ -111,6 +117,7 @@ const CustomerAnalysis: React.FC = () => {
       meterNumber: 'P19100006',
       district: 'ABLEKUMA',
       consumption: 280,
+      expectedMinConsumption: 300,
       paymentHistory: [85, 80, 75, 70, 65],
       riskScore: 70,
       lastReading: '2024-03-19',
@@ -123,6 +130,7 @@ const CustomerAnalysis: React.FC = () => {
       meterNumber: 'P19100007',
       district: 'AMASAMAN',
       consumption: 420,
+      expectedMinConsumption: 300,
       paymentHistory: [50, 45, 40, 35, 30],
       riskScore: 85,
       lastReading: '2024-03-20',
@@ -135,6 +143,7 @@ const CustomerAnalysis: React.FC = () => {
       meterNumber: 'P19100008',
       district: 'KORLE-BU',
       consumption: 190,
+      expectedMinConsumption: 300,
       paymentHistory: [100, 100, 100, 100, 100],
       riskScore: 25,
       lastReading: '2024-03-21',
@@ -300,6 +309,18 @@ const CustomerAnalysis: React.FC = () => {
         <TabsContent value="list" className="space-y-4">
           <div className="grid gap-4">
             {filteredCustomers.map((customer) => {
+              // Calculate consumption percentage below expected
+              const consumptionDeficit = customer.expectedMinConsumption - customer.consumption;
+              const percentageBelow = ((consumptionDeficit) / customer.expectedMinConsumption) * 100;
+              
+              // Determine warning level based on how far below threshold
+              const getWarningText = () => {
+                if (percentageBelow >= 90) return 'Critical: Near-Zero Consumption!';
+                if (percentageBelow >= 70) return 'Severe: Extremely Low Consumption!';
+                if (percentageBelow >= 50) return 'Warning: Very Low Consumption!';
+                return 'Alert: Below Expected Consumption';
+              };
+
               // Get status-based styles
               const statusStyles = {
                 'High Risk': {
@@ -335,11 +356,21 @@ const CustomerAnalysis: React.FC = () => {
                             District: {customer.district}
                           </span>
                           <span className={`text-sm ${styles.text}`}>
-                            Consumption: {customer.consumption} kWh
-                          </span>
-                          <span className={`text-sm ${styles.text}`}>
                             Last Reading: {customer.lastReading}
                           </span>
+                        </div>
+                        {/* Consumption Alert Section */}
+                        <div className="mt-2 p-2 bg-red-50 border border-red-200 rounded">
+                          <p className="text-sm font-medium text-red-800">Low Consumption Alert</p>
+                          <p className="text-sm text-red-700">
+                            Current Consumption: <span className="font-medium">{customer.consumption} kWh</span>
+                            <br />
+                            Expected Minimum: <span className="font-medium">{customer.expectedMinConsumption} kWh</span>
+                            <br />
+                            <span className="font-medium">
+                              {getWarningText()} ({percentageBelow.toFixed(1)}% below normal)
+                            </span>
+                          </p>
                         </div>
                       </div>
                       <div className="flex items-center space-x-4">

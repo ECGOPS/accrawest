@@ -240,6 +240,18 @@ const RealTimeMonitoring = ({ selectedDistrict, onNewCase }: RealTimeMonitoringP
 
             const styles = severityStyles[anomaly.severity];
             
+            // Calculate how much below threshold
+            const consumptionDeficit = anomaly.threshold - anomaly.value;
+            const percentageBelow = ((consumptionDeficit) / anomaly.threshold) * 100;
+            
+            // Determine warning level based on how far below threshold
+            const getWarningText = () => {
+              if (percentageBelow >= 90) return 'Critical: Near-Zero Consumption!';
+              if (percentageBelow >= 70) return 'Severe: Extremely Low Consumption!';
+              if (percentageBelow >= 50) return 'Warning: Very Low Consumption!';
+              return 'Alert: Below Expected Consumption';
+            };
+            
             return (
               <div
                 key={anomaly.id}
@@ -247,7 +259,7 @@ const RealTimeMonitoring = ({ selectedDistrict, onNewCase }: RealTimeMonitoringP
               >
                 <div className="flex items-start space-x-3">
                   {React.cloneElement(getAnomalyIcon(anomaly.anomalyType), {
-                    className: `${styles.icon} h-4 w-4`
+                    className: `${styles.icon} h-4 w-4 animate-pulse`
                   })}
                   <div className="flex flex-col space-y-1">
                     <div className="flex items-center gap-2">
@@ -256,7 +268,13 @@ const RealTimeMonitoring = ({ selectedDistrict, onNewCase }: RealTimeMonitoringP
                     </div>
                     <p className="text-sm text-muted-foreground">{anomaly.description}</p>
                     <p className="text-sm">
-                      Consumption: {anomaly.value} kWh (Threshold: {anomaly.threshold} kWh)
+                      Current Consumption: <span className="text-red-500 font-medium">{anomaly.value} kWh</span>
+                      <br />
+                      Expected Minimum: <span className="font-medium">{anomaly.threshold} kWh</span>
+                      <br />
+                      <span className="text-red-500 font-medium">
+                        {getWarningText()} ({percentageBelow.toFixed(1)}% below normal)
+                      </span>
                     </p>
                     {anomaly.meterNumber && (
                       <p className="text-sm">

@@ -254,9 +254,29 @@ const CaseManagement: React.FC = () => {
                       </p>
                     )}
                     {caseItem.value !== undefined && caseItem.threshold !== undefined && (
-                      <p className="text-xs sm:text-sm text-muted-foreground">
-                        Consumption: {caseItem.value} kWh (Threshold: {caseItem.threshold} kWh)
-                      </p>
+                      <div className="space-y-1 mt-2 p-2 bg-red-50 border border-red-200 rounded">
+                        <p className="text-xs sm:text-sm font-medium text-red-800">Low Consumption Alert</p>
+                        <p className="text-xs sm:text-sm text-red-700">
+                          Current Consumption: <span className="font-medium">{caseItem.value} kWh</span>
+                          <br />
+                          Expected Minimum: <span className="font-medium">{caseItem.threshold} kWh</span>
+                          <br />
+                          {(() => {
+                            const consumptionDeficit = caseItem.threshold - caseItem.value;
+                            const percentageBelow = ((consumptionDeficit) / caseItem.threshold) * 100;
+                            let warningText = '';
+                            if (percentageBelow >= 90) warningText = 'Critical: Near-Zero Consumption!';
+                            else if (percentageBelow >= 70) warningText = 'Severe: Extremely Low Consumption!';
+                            else if (percentageBelow >= 50) warningText = 'Warning: Very Low Consumption!';
+                            else warningText = 'Alert: Below Expected Consumption';
+                            return (
+                              <span className="font-medium">
+                                {warningText} ({percentageBelow.toFixed(1)}% below normal)
+                              </span>
+                            );
+                          })()}
+                        </p>
+                      </div>
                     )}
                   </div>
                   <div className="mt-2 text-sm text-muted-foreground">
