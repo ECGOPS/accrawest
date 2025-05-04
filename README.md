@@ -148,3 +148,9 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 - ECG Accra West Region for project requirements and domain expertise
 - Icons provided by Lucide Icons
 - UI components inspired by shadcn/ui
+
+## Develop by
+
+Kofi Sarkodie
+Cyril Ameko
+Kenneth Kofi Davordzie
